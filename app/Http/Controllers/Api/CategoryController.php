@@ -1,17 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Api; // incase you want to use the base Controller class
-use App\Http\Controllers\Controller; // incase you want to use the base Controller class
-use App\Models\Category; // incase you want to use the Category model
-use Illuminate\Http\Request; //incase you want to use the Request class
-use Illuminate\Support\Facades\Validator; // incase you want to use the Validator facade
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
-    //display a listing of the resource
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): JsonResponse
     {
-        $categories = Category::all();
+        $categories = Category::withCount('products')->get();
         return response()->json([
             'success' => true,
             'message' => 'Categories retrieved successfully',
@@ -19,67 +23,61 @@ class CategoryController extends Controller
         ]);
     }
 
-    //store a newly created resource in storage
-    public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'name'  => 'required|string|max:255',
-            'description' => 'string',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'errors' => $validator->errors()
+                'success' => false,
+                'message' => 'Validation parameters failed.',
+                'errors'  => $validator->errors()
             ], 422);
         }
+
         $category = Category::create($validator->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Category created successfully',
-            'data' => $category
+            'data'    => $category
         ], 201);
     }
 
-    //display the specified resource
-    public function show(string $id)
+    /**
+     * Display the specified resource.
+     */
+    public function show(Category $category): JsonResponse
     {
-        $category = Category::find($id);
-        
-        if (!$category) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Category not found'
-            ], 404);
-        }
-
+        $category->loadCount('products');
         return response()->json([
             'success' => true,
             'message' => 'Category retrieved successfully',
-            'data' => $category
+            'data'    => $category
         ]);
     }
 
-    //update the category
-    public function update(Request $request, string $id)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Category $category): JsonResponse
     {
-        $category = Category::find($id);
-        
-        if (!$category) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Category not found'
-            ], 404);
-        }
-
         $validator = Validator::make($request->all(), [
-            'name'  => 'required|string|max:255',
-            'description' => 'string',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'errors' => $validator->errors()
+                'success' => false,
+                'message' => 'Validation parameters failed.',
+                'errors'  => $validator->errors()
             ], 422);
         }
 
@@ -88,22 +86,15 @@ class CategoryController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Category updated successfully',
-            'data' => $category
+            'data'    => $category
         ]);
     }
 
-    //remove the category and all its products
-    public function destroy(string $id)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Category $category): JsonResponse
     {
-        $category = Category::find($id);
-        
-        if (!$category) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Category not found'
-            ], 404);
-        }
-
         $category->delete();
 
         return response()->json([

@@ -25,7 +25,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('products.store') }}" method="POST">
+            <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
                     <label for="name" class="form-label">Product Name</label>
@@ -47,9 +47,9 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="qty" class="form-label">Quantity</label>
-                            <input type="number" name="qty" id="qty" class="form-control @error('qty') is-invalid @enderror" value="{{ old('qty') }}" required>
-                            @error('qty')
+                            <label for="stock" class="form-label">Stock</label>
+                            <input type="number" name="stock" id="stock" class="form-control @error('stock') is-invalid @enderror" value="{{ old('stock') }}" required>
+                            @error('stock')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -69,6 +69,19 @@
                     @error('category_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="image" class="form-label">Product Image</label>
+                    <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror" accept="image/jpeg,image/png,image/jpg,image/gif">
+                    @error('image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="is_active" id="is_active" class="form-check-input" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
+                    <label for="is_active" class="form-check-label">Active</label>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Create Product</button>
