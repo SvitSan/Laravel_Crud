@@ -38,10 +38,12 @@
                         <thead class="table-light">
                             <tr>
                                 <th>ID</th>
+                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Category</th>
                                 <th>Price</th>
-                                <th>Quantity</th>
+                                <th>Stock</th>
+                                <th>Active</th>
                                 <th>Created</th>
                                 <th>Actions</th>
                             </tr>
@@ -50,15 +52,29 @@
                             @foreach($products as $product)
                                 <tr>
                                     <td>{{ $product->id }}</td>
+                                    <td>
+                                        @if($product->image_url)
+                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" width="50" height="50" style="object-fit: cover; border-radius: 4px;">
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $product->name }}</td>
                                     <td>
-                                        <span class="badge bg-info">{{ $product->category->name }}</span>
+                                        <span class="badge bg-info">{{ $product->category->name ?? 'N/A' }}</span>
                                     </td>
                                     <td>${{ number_format($product->price, 2) }}</td>
                                     <td>
-                                        <span class="badge bg-{{ $product->qty > 0 ? 'success' : 'danger' }}">
-                                            {{ $product->qty }} units
+                                        <span class="badge bg-{{ $product->stock > 0 ? 'success' : 'danger' }}">
+                                            {{ $product->stock }} units
                                         </span>
+                                    </td>
+                                    <td>
+                                        @if($product->is_active)
+                                            <span class="badge bg-success">Active</span>
+                                        @else
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        @endif
                                     </td>
                                     <td>{{ $product->created_at->format('M d, Y') }}</td>
                                     <td>
@@ -75,7 +91,6 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-4">
                     {{ $products->links() }}
                 </div>

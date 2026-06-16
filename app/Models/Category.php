@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $fillable = ['name', 'description'];
+
+    protected $casts = [
+        'description' => 'string',
+    ];
+
     public function products()
     {
         return $this->hasMany(Product::class);

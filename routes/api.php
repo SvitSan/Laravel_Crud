@@ -10,16 +10,9 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Category API Routes
-Route::get('/categories', [ApiCategoryController::class, 'index']);
-Route::post('/categories', [ApiCategoryController::class, 'store']);
-Route::get('/categories/{id}', [ApiCategoryController::class, 'show']);
-Route::put('/categories/{id}', [ApiCategoryController::class, 'update']);
-Route::delete('/categories/{id}', [ApiCategoryController::class, 'destroy']);
-
+Route::apiResource('categories', ApiCategoryController::class);
 // Product API Routes
-Route::get('/products', [ApiProductController::class, 'index']);
-Route::post('/products', [ApiProductController::class, 'store']);
-Route::get('/products/{id}', [ApiProductController::class, 'show']);
-Route::put('/products/{id}', [ApiProductController::class, 'update']);
-Route::delete('/products/{id}', [ApiProductController::class, 'destroy']);
-Route::get('/categories/{categoryId}/products', [ApiProductController::class, 'getByCategory']);
+Route::apiResource('products', ApiProductController::class);
+// Additional route: get products by category
+Route::get('categories/{categoryId}/products', [ApiProductController::class, 'getByCategory']);
+Route::post('products/{id}', [ApiProductController::class, 'update']);
